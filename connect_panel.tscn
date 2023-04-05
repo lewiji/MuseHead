@@ -1,0 +1,58 @@
+[gd_scene load_steps=4 format=3 uid="uid://c1fyafhf4b3fm"]
+
+[ext_resource type="PackedScene" uid="uid://bdhjf3oel2itq" path="res://connect_option.tscn" id="1_4fbje"]
+[ext_resource type="Script" path="res://src/ui/ConnectButton.cs" id="2_nac4q"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0fnv6"]
+bg_color = Color(0.16, 0.16, 0.16, 1)
+
+[node name="ConnectPanel" type="PanelContainer"]
+offset_right = 1152.0
+offset_bottom = 42.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_0fnv6")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+custom_minimum_size = Vector2(200, 42)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="SpacerLeft" type="Control" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.75
+
+[node name="DeviceName" parent="MarginContainer/VBoxContainer/HBoxContainer" instance=ExtResource("1_4fbje")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_stretch_ratio = 0.7
+OptionName = &"Device Name"
+OptionDefault = &"Muse-77D7"
+
+[node name="Port" parent="MarginContainer/VBoxContainer/HBoxContainer" instance=ExtResource("1_4fbje")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_stretch_ratio = 0.5
+OptionName = &"OSC Port"
+OptionType = 1
+OptionDefault = &"7000"
+
+[node name="ConnectButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Connect"
+script = ExtResource("2_nac4q")
+
+[node name="SpacerRight" type="Control" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.03

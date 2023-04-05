@@ -1,0 +1,31 @@
+[gd_scene load_steps=2 format=3 uid="uid://byludlffgx55x"]
+
+[ext_resource type="PackedScene" uid="uid://48r3vqc1nbl0" path="res://graph_bar.tscn" id="1_3tpfc"]
+
+[node name="GraphPanel" type="PanelContainer"]
+self_modulate = Color(0.329412, 0.329412, 0.329412, 1)
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="GraphContainer" type="HBoxContainer" parent="MarginContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 32
+
+[node name="GraphBar" parent="MarginContainer/GraphContainer" instance=ExtResource("1_3tpfc")]
+layout_mode = 2
+
+[node name="GraphBar2" parent="MarginContainer/GraphContainer" instance=ExtResource("1_3tpfc")]
+layout_mode = 2
+
+[node name="GraphBar3" parent="MarginContainer/GraphContainer" instance=ExtResource("1_3tpfc")]
+layout_mode = 2
+
+[node name="GraphBar4" parent="MarginContainer/GraphContainer" instance=ExtResource("1_3tpfc")]
+layout_mode = 2

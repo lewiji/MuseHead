@@ -1,0 +1,27 @@
+[gd_scene load_steps=2 format=3 uid="uid://bdhjf3oel2itq"]
+
+[ext_resource type="Script" path="res://src/ui/ConnectOption.cs" id="1_mxalj"]
+
+[node name="ConnectOption" type="PanelContainer"]
+offset_right = 173.0
+offset_bottom = 41.0
+size_flags_horizontal = 3
+script = ExtResource("1_mxalj")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 5
+
+[node name="OptionContainer" type="HBoxContainer" parent="MarginContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 12
+metadata/_edit_lock_ = true
+
+[node name="Label" type="Label" parent="MarginContainer/OptionContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Option:"

@@ -1,0 +1,48 @@
+[gd_scene load_steps=4 format=3 uid="uid://sjs2lebooa6l"]
+
+[ext_resource type="Script" path="res://src/ui/StatusLabel.cs" id="1_6fdx0"]
+[ext_resource type="LabelSettings" uid="uid://n05lihpu1vtc" path="res://resources/status_label_settings.tres" id="1_7h7my"]
+[ext_resource type="Script" path="res://src/ui/BrainWaveLabel.cs" id="3_5dq7o"]
+
+[node name="StatusPanel" type="PanelContainer"]
+self_modulate = Color(0.666667, 0.666667, 0.666667, 1)
+offset_right = 231.0
+offset_bottom = 31.0
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+text = "Status:"
+
+[node name="StatusLabel" type="Label" parent="MarginContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "DISCONNECTED"
+label_settings = ExtResource("1_7h7my")
+script = ExtResource("1_6fdx0")
+
+[node name="Control" type="Control" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label2" type="Label" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+text = "Wave:"
+
+[node name="BrainWaveLabel" type="Label" parent="MarginContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "NONE"
+label_settings = ExtResource("1_7h7my")
+script = ExtResource("3_5dq7o")

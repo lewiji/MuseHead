@@ -1,0 +1,35 @@
+[gd_scene load_steps=3 format=3 uid="uid://48r3vqc1nbl0"]
+
+[ext_resource type="Script" path="res://src/ui/GraphBar.cs" id="1_p43vj"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_05fm7"]
+line_spacing = 1.0
+font_size = 12
+
+[node name="GraphBar" type="MarginContainer"]
+custom_minimum_size = Vector2(8, 64)
+size_flags_horizontal = 3
+script = ExtResource("1_p43vj")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="ProgressBar" type="ProgressBar" parent="VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+max_value = 1682.82
+step = 9.99999e-06
+value = 50.0
+fill_mode = 3
+show_percentage = false
+
+[node name="Label" type="Label" parent="VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 8
+text = "1000"
+label_settings = SubResource("LabelSettings_05fm7")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
