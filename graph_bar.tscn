@@ -1,6 +1,19 @@
-[gd_scene load_steps=3 format=3 uid="uid://48r3vqc1nbl0"]
+[gd_scene load_steps=6 format=3 uid="uid://48r3vqc1nbl0"]
 
 [ext_resource type="Script" path="res://src/ui/GraphBar.cs" id="1_p43vj"]
+
+[sub_resource type="Gradient" id="Gradient_uf5cv"]
+interpolation_mode = 2
+colors = PackedColorArray(0.1518, 0.66, 0.35508, 1, 0.79, 0.24806, 0.1264, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_s42ua"]
+gradient = SubResource("Gradient_uf5cv")
+width = 100
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_fgm2m"]
+resource_local_to_scene = true
+texture = SubResource("GradientTexture1D_s42ua")
+region_rect = Rect2(0, 0, 1, 1)
 
 [sub_resource type="LabelSettings" id="LabelSettings_05fm7"]
 line_spacing = 1.0
@@ -18,9 +31,10 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
+theme_override_styles/fill = SubResource("StyleBoxTexture_fgm2m")
 max_value = 1.0
 step = 9.99999e-06
-value = 1.0
+value = 0.999999
 fill_mode = 3
 show_percentage = false
 

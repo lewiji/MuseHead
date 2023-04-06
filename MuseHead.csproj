@@ -2,9 +2,20 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <EnableDynamicLoading>true</EnableDynamicLoading>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="FftSharp" Version="1.1.6" />
-    <PackageReference Include="SacaDev.Muse" Version="1.0.5.1" />
+    <PackageReference Include="GodotSharpSome.Drawing2D" Version="0.20.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="lib\SacaDev.Muse\SacaDev.Muse.Test\**" />
+    <Compile Remove="lib\SacaDev.Muse\SacaDev.Muse.Test.Mock\**" />
+    <Compile Remove="lib\SacaDev.Muse\SacaDev.Muse.Cli\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Remove="lib\SacaDev.Muse\SacaDev.Muse.Test\**" />
+    <EmbeddedResource Remove="lib\SacaDev.Muse\SacaDev.Muse.Test.Mock\**" />
+    <EmbeddedResource Remove="lib\SacaDev.Muse\SacaDev.Muse.Cli\**" />
   </ItemGroup>
 </Project>

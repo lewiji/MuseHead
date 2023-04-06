@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://7l3e5jpksjmn"]
+[gd_scene load_steps=6 format=3 uid="uid://cll7b0yxpn4dq"]
 
 [ext_resource type="Texture2D" uid="uid://kljsn20b6d6m" path="res://resources/main-background.tres" id="1_e3uwj"]
 [ext_resource type="PackedScene" uid="uid://c1fyafhf4b3fm" path="res://connect_panel.tscn" id="2_njirl"]
-[ext_resource type="PackedScene" uid="uid://byludlffgx55x" path="res://graph_panel.tscn" id="3_ll7cf"]
+[ext_resource type="PackedScene" uid="uid://byludlffgx55x" path="res://spectrum_bands.tscn" id="3_ll7cf"]
 [ext_resource type="PackedScene" uid="uid://sjs2lebooa6l" path="res://status_panel.tscn" id="3_qtwta"]
+[ext_resource type="PackedScene" uid="uid://u14arvg4hx6r" path="res://freq_power_graph.tscn" id="4_4agsc"]
 
 [node name="Main" type="MarginContainer"]
 anchors_preset = 15
@@ -50,7 +51,15 @@ theme_override_constants/margin_bottom = 16
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="GraphPanel" parent="VBoxContainer/Panel/MarginContainer/VBoxContainer" instance=ExtResource("3_ll7cf")]
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="SpectrumBandPower" parent="VBoxContainer/Panel/MarginContainer/VBoxContainer/HBoxContainer" instance=ExtResource("3_ll7cf")]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="FreqPowerGraph" parent="VBoxContainer/Panel/MarginContainer/VBoxContainer/HBoxContainer" instance=ExtResource("4_4agsc")]
 layout_mode = 2
 
 [node name="StatusPanel" parent="VBoxContainer/Panel/MarginContainer/VBoxContainer" instance=ExtResource("3_qtwta")]

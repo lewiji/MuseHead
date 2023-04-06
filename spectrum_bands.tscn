@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://48r3vqc1nbl0" path="res://graph_bar.tscn" id="1_3tpfc"]
 
-[node name="GraphPanel" type="PanelContainer"]
+[node name="SpectrumBandPower" type="PanelContainer"]
 self_modulate = Color(0.329412, 0.329412, 0.329412, 1)
 size_flags_vertical = 3
 

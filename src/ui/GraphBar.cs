@@ -6,12 +6,18 @@ namespace MuseHead.ui;
 public partial class GraphBar : MarginContainer
 {
 	int _index;
+	double _value;
 	ProgressBar _progressBar = default!;
+	static readonly NodePath ProgressBarValueProperty = new (Range.PropertyName.Value);
 	Label _label = default!;
+	Tween? _tween;
+	StyleBoxTexture _fillTexture;
 	public override void _Ready()
 	{
 		_index = GetIndex();
 		_progressBar = GetNode<ProgressBar>("%ProgressBar");
+		var fill = _progressBar.GetThemeStylebox("fill");
+		_fillTexture = (StyleBoxTexture)fill;
 		_label = GetNode<Label>("%Label");
 		_label.Text = Name;
 		GetNode<MuseConnector>("/root/MuseConnector").EegReceived += OnEegReceived;
@@ -19,15 +25,22 @@ public partial class GraphBar : MarginContainer
 
 	void OnEegReceived(double[] data)
 	{
-		/*if (min < _progressBar.MinValue) _progressBar.MinValue = min;
-		if (max > _progressBar.MaxValue) _progressBar.MaxValue = max;*/
-		
 		if (data.Length >= _index)
 		{
-			_progressBar.Value = data[_index];
-			_label.Text = data[_index].ToString(CultureInfo.InvariantCulture);
+			_tween?.Kill();
+			_tween = CreateTween();
+			_tween
+				.TweenProperty(_progressBar, ProgressBarValueProperty, data[_index], 1.414f)
+				.SetTrans(Tween.TransitionType.Sine)
+				.SetEase(Tween.EaseType.Out);
+			//_value = data[_index];
 		}
 	}
 
-	public override void _Process(double delta) { base._Process(delta); }
+	public override void _PhysicsProcess(double delta)
+	{
+		_fillTexture.RegionRect = new Rect2(
+			new Vector2((float)_progressBar.Value * 100f, 0),
+			_fillTexture.RegionRect.Size);
+	}
 }
