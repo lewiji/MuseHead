@@ -1,13 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using FftSharp;
 using FftSharp.Windows;
 using Godot;
 using MuseHead.eeg;
 using SacaDev.Muse;
-using Window = FftSharp.Window;
 
 namespace MuseHead;
 
@@ -22,7 +20,7 @@ public partial class MuseConnector : Node
    const int BufferSize = SampleRate;
 
    readonly MuseManager _museManager = new();
-   readonly Welch _window = new();
+   readonly Hanning _window = new();
    readonly SensorBuffer[] _sensorBuffers;
    bool _connected;
 
