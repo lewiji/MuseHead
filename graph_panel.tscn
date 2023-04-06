@@ -18,14 +18,17 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 32
 
-[node name="GraphBar" parent="MarginContainer/GraphContainer" instance=ExtResource("1_3tpfc")]
+[node name="Delta" parent="MarginContainer/GraphContainer" instance=ExtResource("1_3tpfc")]
 layout_mode = 2
 
-[node name="GraphBar2" parent="MarginContainer/GraphContainer" instance=ExtResource("1_3tpfc")]
+[node name="Theta" parent="MarginContainer/GraphContainer" instance=ExtResource("1_3tpfc")]
 layout_mode = 2
 
-[node name="GraphBar3" parent="MarginContainer/GraphContainer" instance=ExtResource("1_3tpfc")]
+[node name="Alpha" parent="MarginContainer/GraphContainer" instance=ExtResource("1_3tpfc")]
 layout_mode = 2
 
-[node name="GraphBar4" parent="MarginContainer/GraphContainer" instance=ExtResource("1_3tpfc")]
+[node name="Beta" parent="MarginContainer/GraphContainer" instance=ExtResource("1_3tpfc")]
+layout_mode = 2
+
+[node name="Gamma" parent="MarginContainer/GraphContainer" instance=ExtResource("1_3tpfc")]
 layout_mode = 2

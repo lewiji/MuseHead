@@ -18,9 +18,9 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
-max_value = 1682.82
+max_value = 1.0
 step = 9.99999e-06
-value = 50.0
+value = 1.0
 fill_mode = 3
 show_percentage = false
 

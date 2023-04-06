@@ -13,11 +13,11 @@ public partial class GraphBar : MarginContainer
 		_index = GetIndex();
 		_progressBar = GetNode<ProgressBar>("%ProgressBar");
 		_label = GetNode<Label>("%Label");
-		_label.Text = _index.ToString();
+		_label.Text = Name;
 		GetNode<MuseConnector>("/root/MuseConnector").EegReceived += OnEegReceived;
 	}
 
-	void OnEegReceived(double[] data, double min, double max)
+	void OnEegReceived(double[] data)
 	{
 		/*if (min < _progressBar.MinValue) _progressBar.MinValue = min;
 		if (max > _progressBar.MaxValue) _progressBar.MaxValue = max;*/

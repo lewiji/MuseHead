@@ -1,30 +1,38 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using MuseHead.eeg;
 using SacaDev.Muse;
+using Range = System.Range;
+
 namespace MuseHead;
 
 public partial class MuseConnector : Node
 {
    [Signal] public delegate void ConnectedEventHandler();
    [Signal] public delegate void DisconnectedEventHandler();
-   [Signal] public delegate void EegReceivedEventHandler(double[] data, double lowest, double highest);
-   
-   MuseManager _museManager = new ();
-   string _museAlias { get; set; } = "Muse";
-   int _musePort { get; set; } = 5000;
+   [Signal] public delegate void EegReceivedEventHandler(double[] data);
+
+   readonly MuseManager _museManager = new ();
+   const int SampleRate = 256;
+   const int TotalBufferLength = SampleRate / 4;
+   const double FreqResolution = (double)SampleRate / TotalBufferLength;
+   const int PrimaryBufferLength = (TotalBufferLength); // 16ms = 60fps
+   const int OverlapLength = TotalBufferLength - PrimaryBufferLength;
    bool _connected;
-   double _lowestEegValue = 0.0;
-   double _highestEegValue = 0.0;
-   Queue<ICollection<double>> _eegQueue = new();
+   readonly EegFrame[] _primaryEegBuffer = new EegFrame[PrimaryBufferLength];
+   readonly EegFrame[] _windowOverlapBuffer = new EegFrame[OverlapLength];
+   int _bufferCount;
+   int _overlapCount;
+   
+   public bool IsConnected => _connected;
 
    public void Connect(string deviceName, int port)
    {
-      _museAlias = deviceName;
-      _musePort = port;
-      GD.Print($"Attempting connection to muse '{_museAlias}#{_musePort}''");
+      GD.Print($"Attempting connection to muse '{deviceName}#{port}''");
       
-      _museManager.Connect(_museAlias, _musePort);
+      _museManager.Connect(deviceName, port);
       _museManager.SetSubscriptions(SignalAddress.All);
       _museManager.RemoveSubscriptions(SignalAddress.Gyro | SignalAddress.Acceleration);
       _museManager.MusePacketReceived += MusePacketReceived;
@@ -38,76 +46,113 @@ public partial class MuseConnector : Node
          EmitSignal(SignalName.Connected);
       }
 
-      if (e.Address == SignalAddress.Eeg && e.Values is { })
+      switch (e.Address)
       {
-         var lowest = e.Values.Min();
-         var highest = e.Values.Max();
-
-         if (lowest < _lowestEegValue)
-         {
-            _lowestEegValue = lowest;
-            GD.Print($"Lowest: {_lowestEegValue}");
-         }
-
-         if (highest > _highestEegValue)
-         {
-            _highestEegValue = highest;
-            GD.Print($"Highest: {_highestEegValue}");
-         }
-         
-         _eegQueue.Enqueue(e.Values);
-      } 
-      else if (e.Address is >= SignalAddress.Alpha_Abs and <= SignalAddress.Gamma_Rel)
-      {
-         GD.Print(e.Address);
-         GD.Print(e.Values);
-      } else if (e.Address == SignalAddress.Drlref)
-      {
-         
-      }
-      else
-      {
-         GD.Print($"Unknown: {e.Address}");
+         case SignalAddress.Eeg when e.Values is { }:
+            AddFrame(e.Values.ToArray());
+            break;
+         case >= SignalAddress.Alpha_Abs and <= SignalAddress.Gamma_Rel:
+            GD.Print(e.Address);
+            GD.Print(e.Values);
+            break;
+         case SignalAddress.Drlref:
+            break;
+         default:
+            GD.Print($"Unknown: {e.Address}");
+            break;
       }
    }
 
-   public override void _Process(double delta)
+   void AddFrame(double[] values)
    {
-      if (_eegQueue.Count < 22) return;
+      _primaryEegBuffer[_bufferCount++] = new EegFrame(values);
       
-      var buffer = new double[4][];
-      buffer[0] = new double[_eegQueue.Count];
-      buffer[1] = new double[_eegQueue.Count];
-      buffer[2] = new double[_eegQueue.Count];
-      buffer[3] = new double[_eegQueue.Count];
+      if (_bufferCount < PrimaryBufferLength) return;
       
-      var queueIndex = 0;
-      while (_eegQueue.Count > 0)
+      if (_overlapCount >= OverlapLength)
       {
-         var eeg = _eegQueue.Dequeue();
-         var channel = 0;
-         foreach (var d in eeg)
-         {
-            buffer[channel][queueIndex] = d;
-            channel += 1;
-         }
-         queueIndex += 1;
+         ProcessBuffer();
+      }
+
+      CopyOverlap();
+      _bufferCount = 0;
+   }
+
+   void CopyOverlap()
+   {
+      Array.Copy(_primaryEegBuffer, PrimaryBufferLength - OverlapLength - 1, _windowOverlapBuffer, 0, OverlapLength);
+      _overlapCount = OverlapLength;
+   }
+
+   public void ProcessBuffer()
+   {
+      if (_bufferCount + _overlapCount != TotalBufferLength)
+      {
+         throw new Exception(
+            $"Primary + overlap buffer length was {_bufferCount + _overlapCount}, expected {TotalBufferLength}");
+      }
+      
+      var aFrames = new double[TotalBufferLength];
+      var bFrames = new double[TotalBufferLength];
+      var cFrames = new double[TotalBufferLength];
+      var dFrames = new double[TotalBufferLength];
+
+      for (var olaIdx = 0; olaIdx < _overlapCount; olaIdx++)
+      {
+         aFrames[olaIdx] = _windowOverlapBuffer[olaIdx].A;
+         bFrames[olaIdx] = _windowOverlapBuffer[olaIdx].B;
+         cFrames[olaIdx] = _windowOverlapBuffer[olaIdx].C;
+         dFrames[olaIdx] = _windowOverlapBuffer[olaIdx].D;
+      }
+      
+      for (var i = 0; i < _bufferCount; i++)
+      {
+         aFrames[i] = _primaryEegBuffer[i].A;
+         bFrames[i] = _primaryEegBuffer[i].B;
+         cFrames[i] = _primaryEegBuffer[i].C;
+         dFrames[i] = _primaryEegBuffer[i].D;
       }
 
       var window = new FftSharp.Windows.Hanning();
-      window.ApplyInPlace(buffer[0]);
-      window.ApplyInPlace(buffer[1]);
-      window.ApplyInPlace(buffer[2]);
-      window.ApplyInPlace(buffer[3]);
+      window.ApplyInPlace(aFrames);
+      window.ApplyInPlace(bFrames);
+      window.ApplyInPlace(cFrames);
+      window.ApplyInPlace(dFrames);
 
-      var channel0 = FftSharp.Transform.FFTfreq(220.0, buffer[0]);
-      var channel1 = FftSharp.Transform.FFTfreq(220.0, buffer[1]);
-      var channel2 = FftSharp.Transform.FFTfreq(220.0, buffer[2]);
-      var channel3 = FftSharp.Transform.FFTfreq(220.0, buffer[3]);
+      var aFft = FftSharp.Transform.FFT(aFrames);
+      var bFft = FftSharp.Transform.FFT(bFrames);
+      var cFft = FftSharp.Transform.FFT(cFrames);
+      var dFft = FftSharp.Transform.FFT(dFrames);
+      
+      var aFreq = FftSharp.Transform.FFTfreq(SampleRate, aFrames);
+      var bFreq = FftSharp.Transform.FFTfreq(SampleRate, bFrames);
+      var cFreq = FftSharp.Transform.FFTfreq(SampleRate, cFrames);
+      var dFreq = FftSharp.Transform.FFTfreq(SampleRate, dFrames);
 
-      var averaged = new double[] {Mathf.LinearToDb(buffer[0].Average()), Mathf.LinearToDb(buffer[1].Average()), Mathf.LinearToDb(buffer[2]
-      .Average()), Mathf.LinearToDb(buffer[3].Average())};
+      var aDeltaIndices = new Range(Array.IndexOf(aFreq, aFreq.First(f => f >= BrainWaves.Delta.Start.Value)), Array.IndexOf(aFreq, aFreq.Last(f => f <= BrainWaves.Delta.End.Value)));
+      var aThetaIndices = new Range(Array.IndexOf(aFreq, aFreq.First(f => f >= BrainWaves.Theta.Start.Value)), Array.IndexOf(aFreq, aFreq.Last(f => f <= BrainWaves.Theta.End.Value)));
+      var aAlphaIndices = new Range(Array.IndexOf(aFreq, aFreq.First(f => f >= BrainWaves.Alpha.Start.Value)), Array.IndexOf(aFreq, aFreq.Last(f => f <= BrainWaves.Alpha.End.Value)));
+      var aBetaIndices = new Range(Array.IndexOf(aFreq, aFreq.First(f => f >= BrainWaves.Beta.Start.Value)), Array.IndexOf(aFreq, aFreq.Last(f => f <= BrainWaves.Beta.End.Value)));
+      var aGammaIndices = new Range(Array.IndexOf(aFreq, aFreq.First(f => f >= BrainWaves.Gamma.Start.Value)), Array.IndexOf(aFreq, aFreq.Last(f => f <= BrainWaves.Gamma.End.Value)));
 
-      EmitSignal(SignalName.EegReceived, averaged, _lowestEegValue, _highestEegValue);
+      var aDeltaPower = (aFft[aDeltaIndices.Start.Value..(aDeltaIndices.End.Value + 1)].Sum(f => f.MagnitudeSquared));
+      var aThetaPower = (aFft[aThetaIndices.Start.Value..(aThetaIndices.End.Value + 1)].Sum(f => f.MagnitudeSquared));
+      var aAlphaPower = (aFft[aAlphaIndices.Start.Value..(aAlphaIndices.End.Value + 1)].Sum(f => f.MagnitudeSquared));
+      var aBetaPower = (aFft[aBetaIndices.Start.Value..(aBetaIndices.End.Value + 1)].Sum(f => f.MagnitudeSquared));
+      var aGammaPower = (aFft[aGammaIndices.Start.Value..(aGammaIndices.End.Value + 1)].Sum(f => f.MagnitudeSquared));
+
+      var totalPower = aFft.Sum(f => f.MagnitudeSquared);
+      //var totalPower = aDeltaPower + aThetaPower + aAlphaPower + aBetaPower + aGammaPower;
+
+      var bandPowerNormalized = new double[5]
+      {
+         aDeltaPower / totalPower,
+         aThetaPower / totalPower,
+         aAlphaPower / totalPower,
+         aBetaPower / totalPower,
+         aGammaPower / totalPower
+      };
+
+      EmitSignal(SignalName.EegReceived, bandPowerNormalized);
    }
 }
