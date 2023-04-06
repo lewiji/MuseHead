@@ -4,7 +4,7 @@
 
 [sub_resource type="Gradient" id="Gradient_uf5cv"]
 interpolation_mode = 2
-colors = PackedColorArray(0.1518, 0.66, 0.35508, 1, 0.79, 0.24806, 0.1264, 1)
+colors = PackedColorArray(0.098, 0.014, 0.35, 1, 0.788235, 0.517647, 0.12549, 1)
 
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_s42ua"]
 gradient = SubResource("Gradient_uf5cv")
@@ -32,9 +32,8 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_styles/fill = SubResource("StyleBoxTexture_fgm2m")
-max_value = 1.0
+max_value = 0.6
 step = 9.99999e-06
-value = 0.999999
 fill_mode = 3
 show_percentage = false
 

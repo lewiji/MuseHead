@@ -6,6 +6,7 @@ using FftSharp.Windows;
 using Godot;
 using MuseHead.eeg;
 using SacaDev.Muse;
+using Range = System.Range;
 
 namespace MuseHead;
 
@@ -17,10 +18,11 @@ public partial class MuseConnector : Node
 
    const int NumSensors = 4;
    const int SampleRate = 256;
+   const int SlidingSamples = SampleRate / 16;
    const int BufferSize = SampleRate;
 
    readonly MuseManager _museManager = new();
-   readonly Hanning _window = new();
+   readonly Welch _window = new();
    readonly SensorBuffer[] _sensorBuffers;
    bool _connected;
 
@@ -74,23 +76,13 @@ public partial class MuseConnector : Node
       {
          var buffer = _sensorBuffers[i];
          buffer.Add(values[i]);
-
-         if (!buffer.IsFull()) continue;
-         
-         ProcessBuffer(buffer);
-         buffer.Clear();
       }
    }
 
-   void ProcessBuffer(SensorBuffer buffer)
+   void ProcessBuffer(double[] values)
    {
-      var currentWindow = _window.Apply(Filter.BandPass(buffer.Current, 256.0, 0.5, 40.0));
-      var combinedBuffer = new double[BufferSize];
-      Array.Copy(buffer.Last, BufferSize / 2, combinedBuffer, 0, BufferSize / 2);
-      Array.Copy(currentWindow, 0, combinedBuffer, BufferSize / 2, BufferSize / 2);
-      buffer.CopyWindowToLast(currentWindow);
-      
-      var pow = Transform.FFTmagnitude(combinedBuffer);
+      var currentWindow = _window.Apply(Filter.BandPass(values.ToArray(), 256.0, 0.5, 40.0));
+      var pow = Transform.FFTmagnitude(currentWindow);
       var freq = Transform.FFTfreq(SampleRate, pow.Length);
 
       var aDeltaPower = GetSummedBandPower(pow, freq, BrainWave.Delta);
@@ -117,5 +109,20 @@ public partial class MuseConnector : Node
       var minFreqIndex = Array.IndexOf(freq, freq.First(f => f > BrainWaves.FreqBands[band].Min));
       var maxFreqIndex = Array.IndexOf(freq, freq.Last(f => f <= BrainWaves.FreqBands[band].Max));
       return mag[minFreqIndex..(maxFreqIndex)].Sum();
+   }
+
+   public override void _PhysicsProcess(double delta)
+   {
+      foreach (var sensorBuffer in _sensorBuffers.ToList())
+      {
+         if (sensorBuffer.Values.Count < BufferSize) continue;
+         
+         ProcessBuffer(sensorBuffer.Values.TakeLast(BufferSize).ToArray());
+
+         foreach (var i in Enumerable.Range(0, SlidingSamples))
+         {
+            sensorBuffer.Values.TryDequeue(out _);
+         }
+      }
    }
 }

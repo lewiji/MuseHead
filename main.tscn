@@ -60,6 +60,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="FreqPowerGraph" parent="VBoxContainer/Panel/MarginContainer/VBoxContainer/HBoxContainer" instance=ExtResource("4_4agsc")]
+visible = false
 layout_mode = 2
 
 [node name="StatusPanel" parent="VBoxContainer/Panel/MarginContainer/VBoxContainer" instance=ExtResource("3_qtwta")]

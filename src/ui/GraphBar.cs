@@ -11,7 +11,7 @@ public partial class GraphBar : MarginContainer
 	static readonly NodePath ProgressBarValueProperty = new (Range.PropertyName.Value);
 	Label _label = default!;
 	Tween? _tween;
-	StyleBoxTexture _fillTexture;
+	StyleBoxTexture _fillTexture = default!;
 	public override void _Ready()
 	{
 		_index = GetIndex();
@@ -30,7 +30,7 @@ public partial class GraphBar : MarginContainer
 			_tween?.Kill();
 			_tween = CreateTween();
 			_tween
-				.TweenProperty(_progressBar, ProgressBarValueProperty, data[_index], 1.414f)
+				.TweenProperty(_progressBar, ProgressBarValueProperty, data[_index], 0.512f)
 				.SetTrans(Tween.TransitionType.Sine)
 				.SetEase(Tween.EaseType.Out);
 			//_value = data[_index];
@@ -40,7 +40,7 @@ public partial class GraphBar : MarginContainer
 	public override void _PhysicsProcess(double delta)
 	{
 		_fillTexture.RegionRect = new Rect2(
-			new Vector2((float)_progressBar.Value * 100f, 0),
+			new Vector2((float)_progressBar.Value / (float)_progressBar.MaxValue * 100f, 0),
 			_fillTexture.RegionRect.Size);
 	}
 }
