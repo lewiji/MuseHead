@@ -1,22 +1,30 @@
-[gd_scene load_steps=5 format=3 uid="uid://bvxip4bkuqagw"]
+[gd_scene load_steps=6 format=3 uid="uid://bvxip4bkuqagw"]
 
 [ext_resource type="Script" path="res://src/3d/FreqBandBody3D.cs" id="1_icyhd"]
 
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_nq1bx"]
+bounce = 0.5
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gx5uk"]
+resource_local_to_scene = true
 albedo_color = Color(1, 0.501961, 0, 1)
 metallic = 0.5
 roughness = 0.5
-emission_enabled = true
 emission = Color(0.921569, 0.435294, 0.192157, 1)
 emission_energy_multiplier = 0.5
 
 [sub_resource type="SphereMesh" id="SphereMesh_qf5ne"]
+resource_local_to_scene = true
 material = SubResource("StandardMaterial3D_gx5uk")
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_6g65s"]
 
-[node name="FreqBandBody" type="CharacterBody3D"]
+[node name="FreqBandBody" type="RigidBody3D"]
+mass = 5.0
+physics_material_override = SubResource("PhysicsMaterial_nq1bx")
+can_sleep = false
 script = ExtResource("1_icyhd")
+VelocityScale = 700.0
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 mesh = SubResource("SphereMesh_qf5ne")
@@ -25,7 +33,7 @@ mesh = SubResource("SphereMesh_qf5ne")
 shape = SubResource("SphereShape3D_6g65s")
 
 [node name="Label3D" type="Label3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.393771, 0.880654)
 billboard = 1
 double_sided = false
 no_depth_test = true

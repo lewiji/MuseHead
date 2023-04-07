@@ -42,22 +42,24 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 32
-theme_override_constants/margin_top = 16
-theme_override_constants/margin_right = 32
-theme_override_constants/margin_bottom = 16
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 8
 
 [node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/Panel/MarginContainer"]
 layout_mode = 2
-theme_override_constants/separation = 16
+theme_override_constants/separation = 8
 
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/Panel/MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
+theme_override_constants/separation = 5
 
 [node name="SpectrumBandPower" parent="VBoxContainer/Panel/MarginContainer/VBoxContainer/HBoxContainer" instance=ExtResource("3_ll7cf")]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.62
 
 [node name="SubViewportContainer" type="SubViewportContainer" parent="VBoxContainer/Panel/MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
@@ -66,7 +68,14 @@ stretch = true
 
 [node name="SubViewport" type="SubViewport" parent="VBoxContainer/Panel/MarginContainer/VBoxContainer/HBoxContainer/SubViewportContainer"]
 handle_input_locally = false
-size = Vector2i(2, 2)
+msaa_3d = 1
+use_debanding = true
+positional_shadow_atlas_size = 4096
+positional_shadow_atlas_quad_0 = 1
+positional_shadow_atlas_quad_1 = 1
+positional_shadow_atlas_quad_2 = 2
+positional_shadow_atlas_quad_3 = 3
+size = Vector2i(689, 540)
 render_target_update_mode = 4
 
 [node name="Node3D" parent="VBoxContainer/Panel/MarginContainer/VBoxContainer/HBoxContainer/SubViewportContainer/SubViewport" instance=ExtResource("5_w3rab")]

@@ -1,5 +1,6 @@
 using System.Globalization;
 using Godot;
+using Godot.Collections;
 
 namespace MuseHead.ui;
 
@@ -23,18 +24,14 @@ public partial class GraphBar : MarginContainer
 		GetNode<MuseConnector>("/root/MuseConnector").EegReceived += OnEegReceived;
 	}
 
-	void OnEegReceived(double[] data)
+	void OnEegReceived(Dictionary<int, double[]> data)
 	{
-		if (data.Length >= _index)
-		{
-			_tween?.Kill();
-			_tween = CreateTween();
-			_tween
-				.TweenProperty(_progressBar, ProgressBarValueProperty, data[_index], 0.512f)
-				.SetTrans(Tween.TransitionType.Sine)
-				.SetEase(Tween.EaseType.Out);
-			//_value = data[_index];
-		}
+		_tween?.Kill();
+		_tween = CreateTween();
+		_tween
+			.TweenProperty(_progressBar, ProgressBarValueProperty, data[-1][_index], 0.512f)
+			.SetTrans(Tween.TransitionType.Sine)
+			.SetEase(Tween.EaseType.Out);
 	}
 
 	public override void _PhysicsProcess(double delta)

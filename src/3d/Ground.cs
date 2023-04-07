@@ -1,4 +1,5 @@
 using Godot;
+using Godot.Collections;
 
 namespace MuseHead._3d;
 
@@ -11,9 +12,9 @@ public partial class Ground : MeshInstance3D
 		GetNode<MuseConnector>("/root/MuseConnector").EegReceived += OnEegReceived;
 	}
 
-	void OnEegReceived(double[] data)
+	void OnEegReceived(Dictionary<int, double[]> data)
 	{
-		_material.SetShaderParameter("height_scale", data[3]);
-		_material.SetShaderParameter("noise_period", new Vector2((float)data[1], (float)data[2]));
+		_material.SetShaderParameter("height_scale", Mathf.Abs(data[-1][3]) * 10.0f);
+		_material.SetShaderParameter("noise_period", new Vector2((float)data[-1][1] * 5.0f, (float)data[-1][2] * 5.0f).Abs());
 	}
 }

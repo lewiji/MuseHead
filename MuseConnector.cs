@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using FftSharp;
 using FftSharp.Windows;
@@ -14,7 +15,7 @@ public partial class MuseConnector : Node
 {
    [Signal] public delegate void ConnectedEventHandler();
    [Signal] public delegate void DisconnectedEventHandler();
-   [Signal] public delegate void EegReceivedEventHandler(double[] data);
+   [Signal] public delegate void EegReceivedEventHandler(Godot.Collections.Dictionary<int, double[]> data);
 
    const int NumSensors = 4;
    const int SampleRate = 256;
@@ -25,6 +26,8 @@ public partial class MuseConnector : Node
    readonly Welch _window = new();
    readonly SensorBuffer[] _sensorBuffers;
    bool _connected;
+   Godot.Collections.Dictionary<int, double[]> _signalData = new();
+   bool _locked;
 
    public MuseConnector()
    {
@@ -43,12 +46,17 @@ public partial class MuseConnector : Node
       _museManager.MusePacketReceived += MusePacketReceived;
    }
 
-   void MusePacketReceived(object? sender, MusePacket e)
+   async void MusePacketReceived(object? sender, MusePacket e)
    {
       if (!_connected)
       {
          _connected = true;
          EmitSignal(SignalName.Connected);
+      }
+
+      if (_locked)
+      {
+         await ToSignal(GetTree(), SceneTree.SignalName.PhysicsFrame);
       }
 
       switch (e.Address)
@@ -79,7 +87,7 @@ public partial class MuseConnector : Node
       }
    }
 
-   void ProcessBuffer(double[] values)
+   double[] ProcessBuffer(double[] values)
    {
       var currentWindow = _window.Apply(Filter.BandPass(values.ToArray(), 256.0, 0.5, 40.0));
       var pow = Transform.FFTmagnitude(currentWindow);
@@ -101,7 +109,7 @@ public partial class MuseConnector : Node
          aGammaPower / totalPower
       };
 
-      EmitSignal(SignalName.EegReceived, bandPowerNormalized);
+      return bandPowerNormalized;
    }
 
    double GetSummedBandPower(double[] mag, double[] freq, BrainWave band)
@@ -113,16 +121,41 @@ public partial class MuseConnector : Node
 
    public override void _PhysicsProcess(double delta)
    {
-      foreach (var sensorBuffer in _sensorBuffers.ToList())
+      _locked = true;
+      _signalData.Clear();
+      foreach (var sensorBuffer in _sensorBuffers)
       {
          if (sensorBuffer.Values.Count < BufferSize) continue;
          
-         ProcessBuffer(sensorBuffer.Values.TakeLast(BufferSize).ToArray());
+         _signalData[sensorBuffer.Id] = ProcessBuffer(sensorBuffer.Values.TakeLast(BufferSize).ToArray());
 
          foreach (var i in Enumerable.Range(0, SlidingSamples))
          {
             sensorBuffer.Values.TryDequeue(out _);
          }
+      }
+
+      _locked = false;
+
+      if (_signalData.Count > 0)
+      {
+         double[] avg = {0.0, 0.0, 0.0, 0.0, 0.0};
+         foreach (var (key, value) in _signalData)
+         {
+            for (var index = 0; index < value.Length; index++)
+            {
+               var t = value[index];
+               avg[index] += t;
+            }
+         }
+
+         for (var i = 0; i < avg.Length; i++)
+         {
+            avg[i] /= 4.0;
+         }
+         _signalData[-1] = avg;
+         
+         EmitSignal(SignalName.EegReceived, _signalData);
       }
    }
 }

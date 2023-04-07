@@ -1,5 +1,6 @@
-[gd_scene load_steps=13 format=3 uid="uid://b0qqugs4aam66"]
+[gd_scene load_steps=15 format=3 uid="uid://b0qqugs4aam66"]
 
+[ext_resource type="Script" path="res://src/3d/Sky.cs" id="1_0w8fu"]
 [ext_resource type="PackedScene" uid="uid://bvxip4bkuqagw" path="res://freq_band_3d_body.tscn" id="1_1qpcq"]
 [ext_resource type="Shader" path="res://resources/3d_visualisation_plane.gdshader" id="2_4idbo"]
 [ext_resource type="Script" path="res://src/3d/Ground.cs" id="2_vsom5"]
@@ -41,12 +42,17 @@ radiance_size = 1
 background_mode = 2
 sky = SubResource("Sky_gnv33")
 ambient_light_color = Color(0.84, 0.39564, 0.2604, 0.756863)
-ambient_light_sky_contribution = 0.5
+ambient_light_sky_contribution = 0.62
 tonemap_mode = 3
+tonemap_exposure = 1.14
+tonemap_white = 0.83
 ssr_enabled = true
 ssao_enabled = true
+ssao_light_affect = 1.0
+ssao_ao_channel_affect = 1.0
 sdfgi_enabled = true
 glow_enabled = true
+glow_normalized = true
 glow_bloom = 0.3
 volumetric_fog_enabled = true
 volumetric_fog_density = 0.006
@@ -67,6 +73,9 @@ size = Vector2(64, 64)
 subdivide_width = 16
 subdivide_depth = 16
 
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_8fb0i"]
+bounce = 0.21
+
 [sub_resource type="BoxShape3D" id="BoxShape3D_ao1oc"]
 size = Vector3(32, 1, 32)
 
@@ -74,11 +83,11 @@ size = Vector3(32, 1, 32)
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_l2qcm")
+script = ExtResource("1_0w8fu")
 
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.934294, -0.356503, 0, 0.356503, 0.934294, 0, 2.28137, 8.8573)
+transform = Transform3D(1, 0, 0, 0, 0.972635, -0.23234, 0, 0.23234, 0.972635, 0, 2.28137, 8.8573)
 current = true
-fov = 90.0
 
 [node name="Ground" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.999748, -0.0224628, 0, 0.0224628, 0.999748, 0, -4, -24)
@@ -102,13 +111,14 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.25, 0, 0)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0, 0)
 
 [node name="StaticBody3D" type="StaticBody3D" parent="."]
+physics_material_override = SubResource("PhysicsMaterial_8fb0i")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
-transform = Transform3D(1, 0, 0, 0, 0.997593, 0.0693406, 0, -0.0693406, 0.997593, 0, -3.2, -10)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2.44968, -10)
 shape = SubResource("BoxShape3D_ao1oc")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.390166, 0.920745, 0, -0.920745, 0.390166, 0, 1.99512, 2.59541)
+transform = Transform3D(1, 0, 0, 0, 0.686163, 0.727448, 0, -0.727448, 0.686163, 0, 1.99512, 2.59541)
 light_energy = 0.5
 light_indirect_energy = 2.0
 light_angular_distance = 0.5
