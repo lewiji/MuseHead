@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://c1fyafhf4b3fm" path="res://connect_panel.tscn" id="2_njirl"]
 [ext_resource type="PackedScene" uid="uid://byludlffgx55x" path="res://spectrum_bands.tscn" id="3_ll7cf"]
 [ext_resource type="PackedScene" uid="uid://sjs2lebooa6l" path="res://status_panel.tscn" id="3_qtwta"]
-[ext_resource type="PackedScene" uid="uid://u14arvg4hx6r" path="res://freq_power_graph.tscn" id="4_4agsc"]
+[ext_resource type="PackedScene" uid="uid://b0qqugs4aam66" path="res://3d_visualisation.tscn" id="5_w3rab"]
 
 [node name="Main" type="MarginContainer"]
 anchors_preset = 15
@@ -59,9 +59,17 @@ size_flags_vertical = 3
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="FreqPowerGraph" parent="VBoxContainer/Panel/MarginContainer/VBoxContainer/HBoxContainer" instance=ExtResource("4_4agsc")]
-visible = false
+[node name="SubViewportContainer" type="SubViewportContainer" parent="VBoxContainer/Panel/MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
+size_flags_horizontal = 3
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="VBoxContainer/Panel/MarginContainer/VBoxContainer/HBoxContainer/SubViewportContainer"]
+handle_input_locally = false
+size = Vector2i(2, 2)
+render_target_update_mode = 4
+
+[node name="Node3D" parent="VBoxContainer/Panel/MarginContainer/VBoxContainer/HBoxContainer/SubViewportContainer/SubViewport" instance=ExtResource("5_w3rab")]
 
 [node name="StatusPanel" parent="VBoxContainer/Panel/MarginContainer/VBoxContainer" instance=ExtResource("3_qtwta")]
 layout_mode = 2

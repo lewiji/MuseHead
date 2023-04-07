@@ -1,0 +1,115 @@
+[gd_scene load_steps=13 format=3 uid="uid://b0qqugs4aam66"]
+
+[ext_resource type="PackedScene" uid="uid://bvxip4bkuqagw" path="res://freq_band_3d_body.tscn" id="1_1qpcq"]
+[ext_resource type="Shader" path="res://resources/3d_visualisation_plane.gdshader" id="2_4idbo"]
+[ext_resource type="Script" path="res://src/3d/Ground.cs" id="2_vsom5"]
+
+[sub_resource type="Gradient" id="Gradient_ebjgu"]
+interpolation_mode = 2
+colors = PackedColorArray(0, 0, 0, 1, 0.500333, 0, 0.79, 1)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_vbxe2"]
+seed = 108
+frequency = 0.04
+fractal_lacunarity = 3.0
+domain_warp_enabled = true
+domain_warp_type = 2
+domain_warp_amplitude = 14.0
+domain_warp_fractal_octaves = 1
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_aomju"]
+seamless = true
+normalize = false
+color_ramp = SubResource("Gradient_ebjgu")
+noise = SubResource("FastNoiseLite_vbxe2")
+
+[sub_resource type="PhysicalSkyMaterial" id="PhysicalSkyMaterial_u73cy"]
+rayleigh_coefficient = 1.62
+rayleigh_color = Color(0.94902, 0.494118, 0.227451, 1)
+mie_coefficient = 0.016
+mie_color = Color(0.12549, 0.588235, 0.254902, 1)
+ground_color = Color(0.0313726, 0.341176, 0.0352941, 1)
+energy_multiplier = 0.62
+use_debanding = false
+night_sky = SubResource("NoiseTexture2D_aomju")
+
+[sub_resource type="Sky" id="Sky_gnv33"]
+sky_material = SubResource("PhysicalSkyMaterial_u73cy")
+radiance_size = 1
+
+[sub_resource type="Environment" id="Environment_l2qcm"]
+background_mode = 2
+sky = SubResource("Sky_gnv33")
+ambient_light_color = Color(0.84, 0.39564, 0.2604, 0.756863)
+ambient_light_sky_contribution = 0.5
+tonemap_mode = 3
+ssr_enabled = true
+ssao_enabled = true
+sdfgi_enabled = true
+glow_enabled = true
+glow_bloom = 0.3
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.006
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_hx087"]
+render_priority = 0
+shader = ExtResource("2_4idbo")
+shader_parameter/noise_scale = 1.0
+shader_parameter/noise_period = Vector2(0, 0)
+shader_parameter/height_scale = 2.5
+shader_parameter/albedo_color = Color(0.364706, 0.890196, 0.470588, 1)
+shader_parameter/curvature = 1.0
+shader_parameter/curvature_distance = 7.0
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_bok7l"]
+material = SubResource("ShaderMaterial_hx087")
+size = Vector2(64, 64)
+subdivide_width = 16
+subdivide_depth = 16
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ao1oc"]
+size = Vector3(32, 1, 32)
+
+[node name="Visualisation3D" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_l2qcm")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.934294, -0.356503, 0, 0.356503, 0.934294, 0, 2.28137, 8.8573)
+current = true
+fov = 90.0
+
+[node name="Ground" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.999748, -0.0224628, 0, 0.0224628, 0.999748, 0, -4, -24)
+mesh = SubResource("PlaneMesh_bok7l")
+script = ExtResource("2_vsom5")
+
+[node name="BandBodies" type="Node3D" parent="."]
+
+[node name="Delta" parent="BandBodies" groups=["band_3d_body"] instance=ExtResource("1_1qpcq")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 0, 0)
+
+[node name="Theta" parent="BandBodies" groups=["band_3d_body"] instance=ExtResource("1_1qpcq")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.25, 0, 0)
+
+[node name="Alpha" parent="BandBodies" groups=["band_3d_body"] instance=ExtResource("1_1qpcq")]
+
+[node name="Beta" parent="BandBodies" groups=["band_3d_body"] instance=ExtResource("1_1qpcq")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.25, 0, 0)
+
+[node name="Gamma" parent="BandBodies" groups=["band_3d_body"] instance=ExtResource("1_1qpcq")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0, 0)
+
+[node name="StaticBody3D" type="StaticBody3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+transform = Transform3D(1, 0, 0, 0, 0.997593, 0.0693406, 0, -0.0693406, 0.997593, 0, -3.2, -10)
+shape = SubResource("BoxShape3D_ao1oc")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.390166, 0.920745, 0, -0.920745, 0.390166, 0, 1.99512, 2.59541)
+light_energy = 0.5
+light_indirect_energy = 2.0
+light_angular_distance = 0.5
+shadow_enabled = true
