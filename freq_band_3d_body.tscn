@@ -20,11 +20,10 @@ material = SubResource("StandardMaterial3D_gx5uk")
 [sub_resource type="SphereShape3D" id="SphereShape3D_6g65s"]
 
 [node name="FreqBandBody" type="RigidBody3D"]
-mass = 5.0
 physics_material_override = SubResource("PhysicsMaterial_nq1bx")
 can_sleep = false
 script = ExtResource("1_icyhd")
-VelocityScale = 700.0
+VelocityScale = 50.0
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 mesh = SubResource("SphereMesh_qf5ne")

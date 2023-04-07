@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://b0qqugs4aam66"]
+[gd_scene load_steps=19 format=3 uid="uid://b0qqugs4aam66"]
 
 [ext_resource type="Script" path="res://src/3d/Sky.cs" id="1_0w8fu"]
 [ext_resource type="PackedScene" uid="uid://bvxip4bkuqagw" path="res://freq_band_3d_body.tscn" id="1_1qpcq"]
@@ -79,6 +79,18 @@ bounce = 0.21
 [sub_resource type="BoxShape3D" id="BoxShape3D_ao1oc"]
 size = Vector3(32, 1, 32)
 
+[sub_resource type="SphereShape3D" id="SphereShape3D_jys71"]
+radius = 3.6
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_3ijof"]
+radius = 4.5
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_0f7cy"]
+radius = 6.0
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_4btig"]
+radius = 16.0
+
 [node name="Visualisation3D" type="Node3D"]
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
@@ -123,3 +135,33 @@ light_energy = 0.5
 light_indirect_energy = 2.0
 light_angular_distance = 0.5
 shadow_enabled = true
+
+[node name="Area3D" type="Area3D" parent="."]
+priority = 3.0
+gravity_space_override = 3
+gravity = 2.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
+shape = SubResource("SphereShape3D_jys71")
+
+[node name="Area3D2" type="Area3D" parent="."]
+priority = 2.0
+gravity_space_override = 3
+gravity = 4.5
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D2"]
+shape = SubResource("SphereShape3D_3ijof")
+
+[node name="Area3D3" type="Area3D" parent="."]
+priority = 1.0
+gravity_space_override = 3
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D3"]
+shape = SubResource("SphereShape3D_0f7cy")
+
+[node name="Area3D4" type="Area3D" parent="."]
+gravity_space_override = 3
+gravity = 16.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D4"]
+shape = SubResource("SphereShape3D_4btig")
